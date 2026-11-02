@@ -1,0 +1,92 @@
+<template>
+  <div class="page">
+    <div class="band b1"></div>
+    <div class="band b2"></div>
+    <div class="band b3"></div>
+    <p class="title">旋钮野钓</p>
+    <div class="sprite" for="s in sprites" style="{{s}}"></div>
+    <p class="hint">开发中 · 转表冠收线，控制张力</p>
+  </div>
+</template>
+
+<style>
+  .page {
+    width: 466px;
+    height: 466px;
+    background-color: #02131c;
+  }
+  .band {
+    position: absolute;
+    left: 0;
+    width: 466px;
+  }
+  .b1 {
+    top: 90px;
+    height: 120px;
+    background-color: #031a24;
+  }
+  .b2 {
+    top: 210px;
+    height: 120px;
+    background-color: #02141c;
+  }
+  .b3 {
+    top: 330px;
+    height: 136px;
+    background-color: #010b12;
+  }
+  .title {
+    position: absolute;
+    left: 0;
+    top: 34px;
+    width: 466px;
+    font-size: 34px;
+    color: #7dd3c0;
+    text-align: center;
+  }
+  .hint {
+    position: absolute;
+    left: 0;
+    top: 400px;
+    width: 466px;
+    font-size: 15px;
+    color: #3f6f80;
+    text-align: center;
+  }
+  .sprite {
+    position: absolute;
+    border-radius: 50%;
+  }
+</style>
+
+<script>
+  const CX = 233
+
+  export default {
+    data: {
+      sprites: []
+    },
+
+    onReady() {
+      const out = []
+      const add = (x, y, r, color) => {
+        out.push('left:' + Math.round(x - r) + 'px;top:' + Math.round(y - r) +
+          'px;width:' + Math.round(r * 2) + 'px;height:' + Math.round(r * 2) +
+          'px;background-color:' + color + ';')
+      }
+
+      // 鱼线：一串小点
+      for (let y = 96; y <= 300; y += 12) {
+        add(CX, y, 1.6, '#1e4a5a')
+      }
+      // 钩
+      add(CX, 312, 4, '#d4af5f')
+      // 鱼：身体 + 尾巴 + 眼睛
+      add(CX + 10, 344, 20, '#7dd3c0')
+      add(CX - 14, 344, 7, '#5fb3a2')
+      add(CX + 4, 340, 2.4, '#02131c')
+
+      this.sprites = out
+    }
+  }
+</script>
