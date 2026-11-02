@@ -164,7 +164,7 @@ Windows 放到 `%APPDATA%\glyphix\devices\`。
 ### 构建
 
 ```bash
-cd 应用/旋钮炮塔
+cd 游戏/旋钮炮塔
 gx build -d oppo-rtos-watch -f
 # 产物：.glyphix-work/dist/oppo-rtos-watch/com.rtos.turret2/bundle.pkg
 ```
@@ -190,7 +190,7 @@ adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
 
 ### 升级
 
-改 `应用/旋钮炮塔/src/manifest.json`：
+改 `游戏/旋钮炮塔/src/manifest.json`：
 
 ```json
 { "versionName": "2.0.1", "versionCode": 7 }
