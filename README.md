@@ -1,98 +1,157 @@
-# OPPO Watch S 应用开发与侧载
+# 旋钮炮塔
+
+> 为 **OPPO Watch S** 的圆屏和旋转表冠做的肉鸽塔防。
+> 转表冠瞄准，炮塔自动开火，双击屏幕放大招。10 关 + 无尽，一局 2~4 分钟。
 
 ![platform](https://img.shields.io/badge/platform-OPPO%20Watch%20S%20(OWW262)-0a7ea4?style=flat-square)
 ![os](https://img.shields.io/badge/OS-Glyphix%20OS%20(RTOS)-6b5a33?style=flat-square)
-![lang](https://img.shields.io/badge/app-JavaScript%20%2B%20.ux-d4af5f?style=flat-square)
+![genre](https://img.shields.io/badge/genre-roguelike%20%2F%20tower%20defense-d4af5f?style=flat-square)
 ![license](https://img.shields.io/badge/license-MIT-green?style=flat-square)
-
-在 **OPPO Watch S（型号 OWW262，Glyphix OS，非安卓）** 上开发、构建并侧载第三方应用。
-
-仓库里有一个完整可玩的肉鸽炮塔游戏、一个 AI 塔罗应用、一个 DeepSeek 余额查询应用，以及构建 / 安装 / 排错文档。
-
-> ⚠️ 本项目基于对自有设备的互操作研究，**不包含任何厂商专有代码**。刷机、侧载有风险，后果自负。
 
 ![旋钮炮塔 演示](预览/旋钮炮塔/演示.gif)
 
-> 真机 div 渲染实录：表冠瞄准、自动开火、升级三选一。早期 canvas 版概念演示见 [预览/旋钮炮塔/概念演示-canvas.gif](预览/旋钮炮塔/概念演示-canvas.gif)。
+> 真机 div 渲染实录。演示视频：[演示.mp4](预览/旋钮炮塔/演示.mp4)
 
 ---
 
-## 这台表是什么
+## 为什么是这块表
 
-| 项目 | 说明 |
+| 硬件 | 怎么用 |
 |---|---|
-| 型号 | OPPO Watch S（OWW262） |
-| 屏幕 | 466 × 466 圆形 AMOLED |
-| 系统 | **Glyphix OS**，RTOS 上的轻量 JS 应用框架，**不是 Android / Wear OS** |
-| 应用格式 | `.rpk`（构建产物叫 `bundle.pkg`，改名即可） |
-| 开发语言 | JavaScript + `.ux` 单文件组件（template / style / script） |
-| 网络 | 无 Wi-Fi、无 eSIM，`@system.fetch` 经手机代理出网（实测可用） |
-| 固件 | nucleus `0.7.0-44` / runtime `0.7.0-68` |
+| **旋转表冠** | 模拟量瞄准，不是四方向键；转多快炮塔转多快 |
+| **466×466 圆屏** | 360° 环形战场，敌人从任意方向进场 |
+| **触摸屏** | 只负责“开始 / 确认 / 双击大招”，不承担高频操作 |
+| **无 Wi-Fi** | 纯单机，不需要网络 |
 
-因此：
+设计上刻意做了两个取舍：
 
-- ❌ 不能用 `adb install xxx.apk`
-- ❌ 不能装 Wear OS 应用
-- ✅ 用 `glyphix-cli`（`gx`）构建 `.rpk`
-- ✅ 用手机端 **瑰元助手** 经 OPPO 健康的调试通道侧载
+1. **自动开火**。手表上一直戳屏幕又累又挡视野，把操作收敛到“只瞄准”。
+2. **双击放大招**。不占画面、不需要额外按钮；表冠按压也绑定了同一个动作。
 
 ---
 
-## 项目内容
+## 操作
 
-| 应用 | 类型 | 说明 |
-|---|---|---|
-| [旋钮炮塔](应用/旋钮炮塔/) | 游戏 | 表冠瞄准 + 自动开火 + 双击大招的肉鸽塔防，10 关 + 无尽、5 种敌人、9 种升级、4 把武器、8 个成就 |
-| [AI 塔罗](应用/AI塔罗/) | 应用 | 表冠选牌，DeepSeek 现场生成今日指引 |
-| [DS 余额](应用/DS余额/) | 应用 | DeepSeek API 余额查询，大字号圆屏布局 |
-| [二维码示例](应用/二维码示例/) | 示例 | 二维码展示（来自上游仓库） |
-| [包名诊断](应用/包名诊断/) | 诊断 | 显示手表已安装包名，用于排查 |
-| [清理工具](应用/清理工具/) | 工具 | 批量卸载侧载应用，恢复桌面入口 |
-| [表盘实验](应用/表盘实验/) | 实验 | 表盘包（`type: dial`），可安装但系统表盘选择器不展示 |
-
-预览：
-
-| 旋钮炮塔 | AI 塔罗 |
+| 操作 | 作用 |
 |---|---|
-| ![菜单](预览/旋钮炮塔/截图-菜单.png) | ![塔罗](预览/AI塔罗/截图-分镜.png) |
-| ![战斗](预览/旋钮炮塔/截图-战斗.png) | ![塔罗演示](预览/AI塔罗/演示.gif) |
-| ![升级](预览/旋钮炮塔/截图-升级.png) | ![DS余额](预览/DS余额/截图.png) |
+| 转表冠 | 瞄准；菜单里换武器；升级界面选卡 |
+| 自动开火 | 有敌人且冷却结束即射击 |
+| 双击屏幕 | 放大招（充能满时） |
+| 表冠按压 | 同样放大招（真机上报 `Power` 键） |
+| 单击 | 开始 / 升级确认 / 结算返回 |
 
 ---
 
-## 方法来源与致谢
+## 游戏系统
 
-本项目的侧载方法、平台文档和部分工具来自这些作者。**没有他们，就没有这个仓库**：
+### 关卡
 
-| 来源 | 做了什么 | 许可 |
-|---|---|---|
-| [chengchengking/oppo-watch-s-sideload](https://github.com/chengchengking/oppo-watch-s-sideload) | 完整的 OWS 侧载工具链、`DEV_GUIDE`、协议逆向档案、`qrwatch`、`ows.py`、设备配置 | MIT |
-| 班巴论坛教程作者 **libiao0418** | 最早的 OWS 侧载教程：瑰元助手 + PurrLaunch 路线 | — |
-| **瑰元助手作者** | 手机端安装器，调试通道能装 rpk | 版权归作者，本仓库不分发 |
-| [purrrock/PurrLaunch](https://github.com/purrrock/PurrLaunch) | 占位启动器，解决桌面入口 | MIT |
-| [glyphix-os/web-docs](https://github.com/glyphix-os/web-docs) | Glyphix 官方框架 / 组件 / API 文档 | 官方文档 |
+- 固定 **10 关**，之后进入**无尽模式**，敌人数量和速度继续增长
+- 每 **5 关** 一个 Boss
+- 清关后 **三选一升级**，用表冠选、点击确认
+- 漏怪到中心扣 1 血，初始 5 血
 
-详细出处与核实日期见 [文档/上游资料/SOURCES.md](文档/上游资料/SOURCES.md)，许可证归属见 [NOTICE](NOTICE)。再次感谢以上作者。
+### 敌人
+
+| 类型 | HP | 行为 | 应对 |
+|---|---|---|---|
+| **冲锋者** | 1 + 波数/7 | 直线冲中心 | 基础靶子 |
+| **装甲者** | 3 + 波数/4 | 慢，带护甲环 | 需要伤害/穿透 |
+| **分裂者** | 2 | 死亡分裂成 2 个小冲锋者 | 别在中心附近杀 |
+| **疾行者** | 1 | 蛇形突进，速度快 | 考验表冠跟手 |
+| **炮击者** | 2 | 停在半路，向中心射弹 | 优先点掉 |
+| **Boss** | 28 + 10×序号 | 环形弹幕 + 召唤小怪 | 清弹幕 + 集火 |
+
+同屏敌人上限 12，超出的在生成队列等待——不会出现“看不见但会打你”的怪。
+
+### 升级池
+
+每关随机 3 选 1：
+
+| 升级 | 效果 |
+|---|---|
+| 超频 | 射速 +25% |
+| 高能弹头 | 伤害 +1 |
+| 多重弹幕 | 弹丸 +1 |
+| 穿透 | 穿透 +1 |
+| 暴击 | 15% 概率双倍伤害，可叠到 60% |
+| 护甲 | 生命上限 +1，并回复 1 |
+| 僚机 | 环绕炮塔自动开火，最多 2 架 |
+| 减速场 | 全场敌人移速 -20%，最多 -60% |
+| 爆炸弹 | 击杀对 45px 内敌人造成等量伤害 |
+
+### 武器
+
+| 武器 | 冷却 | 伤害 | 弹丸 | 穿透 | 解锁 |
+|---|---|---|---|---|---|
+| 脉冲炮 | 0.28s | 1 | 1 | 0 | 默认 |
+| 散射炮 | 0.42s | 1 | 3（±0.18 rad） | 0 | 到达第 3 关 |
+| 激光 | 0.20s | 1 | 1 | 4 | 累计击杀 80 |
+| 导弹 | 0.72s | 2 | 1（追踪） | 0 | 击败第一个 Boss |
+
+### 大招
+
+**超载冲击**：
+
+- 清空全场敌方弹幕
+- 对所有敌人造成 6 点伤害
+- 每次击杀充能 +5%，20 杀充满
+- 充能条在炮塔下方，满了变金色
+
+### 成就
+
+| 成就 | 条件 |
+|---|---|
+| 初次击杀 | 累计击杀 ≥ 1 |
+| 猎手 | 累计击杀 ≥ 100 |
+| 清道夫 | 累计击杀 ≥ 500 |
+| 深入 | 到达第 5 关 |
+| 深渊 | 到达第 10 关 |
+| 屠龙者 | 击败第一个 Boss |
+| 过载 | 使用大招 ≥ 10 次 |
+| 军火库 | 解锁全部武器 |
+
+最高关数、总击杀、武器、成就全部存在本地。
+
+### 分数
+
+- 击杀分数 × 连击倍率（`1 + (combo-1)*0.1`，上限 3）
+- 清关 +50
+- Boss +500
 
 ---
 
-## 快速开始
+## 截图
 
-### 0. 你需要
+| 主菜单 | 战斗 |
+|---|---|
+| ![菜单](预览/旋钮炮塔/截图-菜单.png) | ![战斗](预览/旋钮炮塔/截图-战斗.png) |
 
-- OPPO Watch S（OWW262）
-- 一台**安卓手机**（装 OPPO 健康 + 瑰元助手，用蓝牙连手表）
-- 电脑（Node.js 18+、Python 3、Android platform-tools）
-- 数据线
+| 升级三选一 | 完整流程 |
+|---|---|
+| ![升级](预览/旋钮炮塔/截图-升级.png) | ![流程](预览/旋钮炮塔/截图-流程.png) |
 
-### 1. 装构建工具
+早期 canvas 版概念演示（真机不支持 canvas，仅作对比）：
+
+[概念演示-canvas.gif](预览/旋钮炮塔/概念演示-canvas.gif)
+
+---
+
+## 构建
+
+### 环境
+
+- Node.js 18+
+- Python 3
+- Android platform-tools（`adb`）
+- 安卓手机（OPPO 健康 + 瑰元助手）
 
 ```bash
 npm install -g glyphix-cli
 gx --version   # v0.11.0 左右
 ```
 
-### 2. 装设备配置
+### 设备配置
 
 ```bash
 mkdir -p ~/.local/share/glyphix/devices
@@ -102,7 +161,7 @@ gx list device | grep oppo-rtos-watch
 
 Windows 放到 `%APPDATA%\glyphix\devices\`。
 
-### 3. 构建
+### 构建
 
 ```bash
 cd 应用/旋钮炮塔
@@ -110,123 +169,108 @@ gx build -d oppo-rtos-watch -f
 # 产物：.glyphix-work/dist/oppo-rtos-watch/com.rtos.turret2/bundle.pkg
 ```
 
-### 4. 安装
+### 安装到手表
 
-1. 把 `bundle.pkg` 改名为 `xxx.rpk`
-2. `adb push xxx.rpk /sdcard/Download/`
-3. `adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Download/xxx.rpk`
-4. 手机打开 **瑰元助手** → 连接 → 选 **OPPO 健康**
-5. 安装应用 → 文件 → 下载 → 选 rpk
-6. 日志出现 `安装应用 成功 {"code":200}` 即成功
-7. **重启手表**（重要，见下方"关键坑"）
-
-> 瑰元助手不随仓库分发（版权归其作者）。发布页：<https://www.pgyer.com/glyphix-assistant>
-
----
-
-## 关键坑（务必先读）
-
-完整版见 [文档/排错手册.md](文档/排错手册.md)。
-
-1. **真机不支持 canvas**
-   模拟器里 canvas 正常，真机上 `getContext('2d')` 拿不到可用上下文，画面全黑。
-   本仓库的炮塔游戏因此改成了 **纯 div 渲染**（圆点/圆形元素 + 行内 left/top）。新应用请直接从 div 方案起步。
-
-2. **行内 `border-radius` 不生效**
-   `style="...border-radius:8px"` 在真机上报 `unknown style property: borderRadius` 并被忽略。
-   解决：用 CSS 类写 `border-radius: 50%`，行内只放 left/top/width/height/background-color。
-
-3. **行内 `border` 也不生效**
-   同上。画圆环用"外层实心圆 + 内层背景色圆"两层拼。
-
-4. **动态 class 绑定不可用**
-   用 `if` 写两份静态 class 的元素切换，不要 `class="{{...}}"`。
-
-5. **`transform: rotate()` 不可用**
-   旋转元素要自己算坐标，或者用一串圆点模拟方向。
-
-6. **触摸事件**
-   - 只有**有实底色**的元素能命中触摸；透明层收不到。
-   - 覆盖层用 `on:touchend`，`on:click` 在部分场景不触发。
-   - canvas / div 的 `touchstart` / `touchend` 可用；透明层不行。
-   - 层级冲突时，把点击同时挂在多层，用时间戳去重。
-
-7. **表冠**
-   - 旋转：`on:wheel`，事件字段只有 `deltaY`。
-   - **真机的 deltaY 比模拟器大得多**，必须限幅（本项目为 `clamp(±1.5) * 0.02`）。
-   - 按压：真机上报为 `Power` 键，`on:keydown` 能收到；用 `stopPropagation()` 可拦截系统默认返回。
-
-8. **装完必须重启**
-   侧载后桌面入口映射会临时错乱（点微信打开别的应用）。重启手表即可恢复；清理侧载应用也能恢复。
-
-9. **覆盖商店应用会签名冲突**
-   用调试通道覆盖 `com.xfaith.woodenfish`（敲木鱼）后，商店再装同包名会失败。想恢复：先卸载侧载包，再从商店装。
-
-10. **升级要加 `versionCode`**
-    覆盖安装时 `versionCode` 必须比已装的大。
-
-11. **manifest 的 `icon` 必填**
-    真机缺 icon 直接 `5005 invalid package`，模拟器却照跑。
-
----
-
-## 目录结构
-
-```
-.
-├── 应用/
-│   ├── 旋钮炮塔/         # 肉鸽炮塔（完整源码）
-│   ├── AI塔罗/           # AI 塔罗（含 build.sh 注入 key）
-│   ├── DS余额/           # DeepSeek 余额（含 build.sh 注入 key）
-│   ├── 二维码示例/       # 二维码（上游）
-│   ├── 包名诊断/         # 显示已安装包名
-│   ├── 清理工具/         # 批量卸载
-│   └── 表盘实验/         # 表盘包实验
-├── 文档/
-│   ├── 构建与安装.md
-│   ├── 排错手册.md
-│   ├── 游戏设计.md
-│   └── 上游资料/         # 上游逆向与平台文档（MIT，见致谢）
-├── 设备配置/
-│   └── oppo-rtos-watch.yml
-├── 预览/
-│   ├── 旋钮炮塔/         # 截图 / GIF / MP4
-│   ├── AI塔罗/
-│   └── DS余额/
-├── 工具/
-│   ├── ows.py            # 上游一键构建/推送
-│   └── pkg_tool.py       # .pkg 容器读写
-├── LICENSE
-├── NOTICE
-└── README.md
-```
-
----
-
-## 构建说明
-
-见 [文档/构建与安装.md](文档/构建与安装.md)。
-
-**API key 不会入库**：`aitarot` 和 `dsbalance` 的 `config.js` 里只有占位符，`build.sh` 从 `~/.config/dsbalance.key` 读取并注入，构建完自动还原源码。
+1. `bundle.pkg` 改名为 `turret2.rpk`
+2. 推到手机并触发媒体扫描：
 
 ```bash
-printf '%s' 'sk-你的key' > ~/.config/dsbalance.key
-chmod 600 ~/.config/dsbalance.key
-cd 应用/DS余额 && ./build.sh
+adb push turret2.rpk /sdcard/Download/
+adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
+  -d file:///sdcard/Download/turret2.rpk
 ```
 
-> 构建出的 rpk 内嵌 key，**不要分享或上传**。
+3. 手机打开 **瑰元助手** → 连接 → 选 **OPPO 健康**
+4. 安装应用 → 文件选择器默认停在「最近」的图片，先点顶部切到 **文件** → 搜索 `turret2`
+5. 日志出现 `安装应用 成功 {"code":200}`
+6. **重启手表**
+
+> 装完必须重启，否则桌面入口映射会临时错乱。
+> 完整步骤见 [文档/构建与安装.md](文档/构建与安装.md)。
+
+### 升级
+
+改 `应用/旋钮炮塔/src/manifest.json`：
+
+```json
+{ "versionName": "2.0.1", "versionCode": 7 }
+```
+
+`versionCode` 必须比已装的大。
 
 ---
 
-## 致谢
+## 技术细节
 
-完整的方法来源见上方 [方法来源与致谢](#方法来源与致谢)。核心上游：[chengchengking/oppo-watch-s-sideload](https://github.com/chengchengking/oppo-watch-s-sideload)、[purrrock/PurrLaunch](https://github.com/purrrock/PurrLaunch)、[glyphix-os/web-docs](https://github.com/glyphix-os/web-docs)、瑰元助手作者。各资源的许可证见 [NOTICE](NOTICE)。
+### 真机没有 canvas
+
+模拟器里 canvas 正常，真机上 `getContext('2d')` 拿不到可用上下文，画面全黑。
+所以游戏用 **纯 div 渲染**：
+
+- 雷达圈：静态 div
+- 动态元素：`sprites` 数组，每帧生成 `style` 字符串
+- 圆：CSS 类 `border-radius: 50%`（行内 `border-radius` 无效）
+- 环：外层实心圆 + 内层背景色圆
+- 朝向：沿角度分布的一串圆点
+- 刷新率：25fps（40ms），同屏数量有上限
+
+### 表冠
+
+- `on:wheel`，事件只有 `deltaY`
+- 真机 `deltaY` 比模拟器大得多，已限幅：`clamp(±1.5) * 0.02`
+- 按压在真机上上报为 `Power` 键，`on:keydown` 可接收
+
+### 触摸
+
+- 只有**有实底色**的元素能命中触摸，透明层收不到
+- 覆盖层用 `on:touchend`
+- 点击同时挂在多层，用 80ms 时间戳去重
+
+更多坑见 [文档/排错手册.md](文档/排错手册.md)。
 
 ---
+
+## 已知问题
+
+- 双击大招依赖 `touchend`，不同固件可能需要调整阈值（当前 480ms）
+- 成就页暂未提供入口，数据仍在记录
+- Boss 只做了基础行为，数值待调
+
+## 路线
+
+1. Boss 多阶段、弱点、专属弹幕
+2. 成就界面与结算展示
+3. 每日挑战（固定种子）
+4. 更多武器：电弧链、霰射地雷
+5. 局外成长
+
+---
+
+## 方法来源与致谢
+
+这个游戏的侧载方法、平台文档来自这些作者。**没有他们，就没有这个项目**：
+
+| 来源 | 做了什么 | 许可 |
+|---|---|---|
+| [chengchengking/oppo-watch-s-sideload](https://github.com/chengchengking/oppo-watch-s-sideload) | 完整的 OWS 侧载工具链、`DEV_GUIDE`、协议逆向档案、`qrwatch`、`ows.py`、设备配置 | MIT |
+| 班巴论坛教程作者 **libiao0418** | 最早的 OWS 侧载教程：瑰元助手 + PurrLaunch 路线 | — |
+| **瑰元助手作者** | 手机端安装器，调试通道能装 rpk | 版权归作者，本仓库不分发 |
+| [purrrock/PurrLaunch](https://github.com/purrrock/PurrLaunch) | 占位启动器，解决桌面入口 | MIT |
+| [glyphix-os/web-docs](https://github.com/glyphix-os/web-docs) | Glyphix 官方框架 / 组件 / API 文档 | 官方文档 |
+
+详细出处见 [文档/上游资料/SOURCES.md](文档/上游资料/SOURCES.md)，许可证归属见 [NOTICE](NOTICE)。
+
+---
+
+## 仓库里的其他内容
+
+首页只放这一个项目。同仓库还有：
+
+- [AI 塔罗](应用/AI塔罗/) —— 表冠选牌，DeepSeek 生成今日指引
+- [DS 余额](应用/DS余额/) —— DeepSeek API 余额查询
+- [二维码示例](应用/二维码示例/) / [包名诊断](应用/包名诊断/) / [清理工具](应用/清理工具/) / [表盘实验](应用/表盘实验/)
+- [构建与安装](文档/构建与安装.md) · [排错手册](文档/排错手册.md) · [游戏设计](文档/游戏设计.md)
 
 ## License
 
-本项目原创部分（`turret2`、`aitarot`、`dsbalance`、`pkglist`、`cleanup`、`dsdial` 及本文档）采用 **MIT**，见 [LICENSE](LICENSE)。
-
-上游资源遵循各自许可证，详见 [NOTICE](NOTICE)。
+MIT，见 [LICENSE](LICENSE)。上游资源遵循各自许可证，见 [NOTICE](NOTICE)。
