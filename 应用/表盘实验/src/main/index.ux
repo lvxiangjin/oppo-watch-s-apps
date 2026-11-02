@@ -1,0 +1,41 @@
+<template>
+  <div class="dial">
+    <p class="time">{{time}}</p>
+    <p class="date">{{date}}</p>
+    <p class="brand">DEEPSEEK</p>
+  </div>
+</template>
+<style>
+  .dial {
+    width: 466px;
+    height: 466px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000;
+  }
+  .time { font-size: 120px; color: #ffffff; }
+  .date { font-size: 30px; color: #8a8a8a; margin-top: 6px; }
+  .brand { font-size: 24px; color: #4d7cff; margin-top: 18px; }
+</style>
+<script>
+  export default {
+    data: { time: '--:--', date: '' },
+    timer: null,
+    onShow() {
+      this.tick()
+      this.timer = setInterval(() => this.tick(), 1000)
+    },
+    onHide() {
+      if (this.timer) { clearInterval(this.timer); this.timer = null }
+    },
+    tick() {
+      const d = new Date()
+      const p = n => (n < 10 ? '0' + n : '' + n)
+      this.time = p(d.getHours()) + ':' + p(d.getMinutes())
+      const w = ['日','一','二','三','四','五','六'][d.getDay()]
+      this.date = (d.getMonth() + 1) + '月' + d.getDate() + '日 周' + w
+    }
+  }
+</script>

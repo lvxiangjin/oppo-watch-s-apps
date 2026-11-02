@@ -1,0 +1,10 @@
+{
+  "package": "com.rtos.turret2",
+  "name": "旋钮炮塔",
+  "icon": "/assets/icon.png",
+  "versionName": "2.0.0",
+  "versionCode": 6,
+  "features": [],
+  "router": { "entry": "main", "pages": { "main": { "component": "index" } } },
+  "config": { "designWidth": 466 }
+}

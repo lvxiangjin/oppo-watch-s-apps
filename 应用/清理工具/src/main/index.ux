@@ -1,0 +1,67 @@
+<template>
+  <div class="page">
+    <p class="title">清理占位包</p>
+    <div class="list">
+      <p class="item" for="l in lines">{{l}}</p>
+    </div>
+    <p class="hint">完成后重启手表</p>
+  </div>
+</template>
+<style>
+  .page {
+    width: 466px; height: 466px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background-color: #000000;
+  }
+  .title { font-size: 24px; color: #ff6b6b; margin-bottom: 12px; }
+  .list { width: 380px; }
+  .item { font-size: 16px; color: #dddddd; text-align: center; padding-top: 3px; padding-bottom: 3px; }
+  .hint { font-size: 16px; color: #777777; margin-top: 12px; }
+</style>
+<script>
+  import pkg from '@system.package'
+
+  export default {
+    data: { lines: ['准备中…'] },
+    running: false,
+
+    onShow() {
+      if (!this.running) this.run()
+    },
+
+    async run() {
+      this.running = true
+      const targets = [
+        'com.rtos.dsdial',
+        'com.rtos.dsbalance',
+        'com.rtos.pkglist',
+        'com.rtos.qrwatch',
+        'com.xfaith.woodenfish',
+        'com.rtos.cleanup'
+      ]
+      const out = []
+      this.lines = out
+      for (let i = 0; i < targets.length; i++) {
+        const t = targets[i]
+        try {
+          await pkg.remove({ package: t, id: t, app: t, pkg: t })
+          out.push('OK  ' + t)
+          console.info('CLEANUP OK ' + t)
+        } catch (e) {
+          out.push('FAIL ' + t)
+          console.error('CLEANUP FAIL ' + t + ' ' + e)
+        }
+        this.lines = out.slice()
+        await this.sleep(700)
+      }
+      out.push('完成')
+      this.lines = out.slice()
+      console.info('CLEANUP DONE')
+    },
+
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    }
+  }
+</script>

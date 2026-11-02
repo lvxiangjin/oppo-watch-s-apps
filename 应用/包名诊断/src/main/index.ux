@@ -1,0 +1,52 @@
+<template>
+  <div class="page">
+    <p class="title">包列表 {{count}}</p>
+    <scroll class="list">
+      <div class="row" for="name in items">
+        <p class="name">{{name}}</p>
+      </div>
+    </scroll>
+  </div>
+</template>
+<style>
+  .page {
+    width: 466px;
+    height: 466px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #000000;
+    padding-top: 46px;
+  }
+  .title { font-size: 22px; color: #4d7cff; }
+  .list { width: 360px; height: 360px; margin-top: 10px; }
+  .row { padding-top: 5px; padding-bottom: 5px; }
+  .name { font-size: 16px; color: #dddddd; text-align: center; }
+</style>
+<script>
+  import pkg from '@system.package'
+  export default {
+    data: { count: '…', items: [] },
+    onShow() {
+      try {
+        const apps = pkg.list('app') || []
+        const hot = []
+        const rest = []
+        for (let i = 0; i < apps.length; i++) {
+          const n = '' + apps[i]
+          if (n.indexOf('tencent') >= 0 || n.indexOf('weixin') >= 0 ||
+              n.indexOf('wechat') >= 0 || n.indexOf('woodenfish') >= 0 ||
+              n.indexOf('rtos') >= 0) hot.push(n)
+          else rest.push(n)
+        }
+        hot.sort(); rest.sort()
+        this.items = hot.concat(rest)
+        this.count = '' + apps.length
+        console.info('PKGLIST ' + JSON.stringify(apps))
+      } catch (e) {
+        console.error('PKGLIST ERR ' + e)
+        this.count = 'ERR'
+      }
+    }
+  }
+</script>

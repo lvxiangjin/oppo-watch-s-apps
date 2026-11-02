@@ -1,0 +1,1414 @@
+<template>
+  <div class="page" on:wheel="onWheel($event)" on:click="onTap" on:keydown="onKey($event)" on:longpress="castUlt">
+    <div class="world" on:touchstart="onTouchStart($event)" on:touchend="onTouchEnd($event)" on:longpress="castUlt">
+      <div class="ring" style="left:163px;top:163px;width:140px;height:140px;"></div>
+      <div class="ring" style="left:113px;top:113px;width:240px;height:240px;"></div>
+      <div class="ring" style="left:63px;top:63px;width:340px;height:340px;"></div>
+      <div class="ring" style="left:13px;top:13px;width:440px;height:440px;"></div>
+      <div class="vignette"></div>
+      <div class="sprite" for="sp in sprites" style="{{sp}}"></div>
+    </div>
+
+    <div class="hud" if="{{hudVisible}}">
+      <p class="hud-wave">WAVE {{wave}}</p>
+      <p class="hud-line">SCORE {{score}}</p>
+      <p class="hud-line">HP {{hp}}</p>
+    </div>
+    <p class="combo" if="{{comboVisible}}">x{{combo}}</p>
+
+    <div class="banner" if="{{bannerVisible}}">
+      <p class="banner-text">{{banner}}</p>
+    </div>
+
+
+
+    <div class="overlay" if="{{menuVisible}}" on:touchend="onTap">
+      <p class="title">旋钮炮塔</p>
+      <p class="sub">BEST WAVE {{bestWave}} · KILLS {{totalKills}}</p>
+      <div class="weapon-box">
+        <p class="weapon-name">{{weaponName}}</p>
+        <p class="weapon-desc">{{weaponDesc}}</p>
+        <p class="weapon-hint">转表冠换武器 · 点击开始</p>
+        <p class="weapon-hint2">自动开火 · 双击屏幕放大招</p>
+      </div>
+    </div>
+
+    <div class="overlay" if="{{upgradeVisible}}" on:touchend="onTap">
+      <p class="up-title">选择升级</p>
+      <div class="cards">
+        <div class="card-slot">
+          <div class="card-sel" if="{{sel === 0}}">
+            <p class="c-name">{{c0n}}</p>
+            <p class="c-desc">{{c0d}}</p>
+          </div>
+          <div class="card" if="{{sel !== 0}}">
+            <p class="c-name">{{c0n}}</p>
+            <p class="c-desc">{{c0d}}</p>
+          </div>
+        </div>
+        <div class="card-slot">
+          <div class="card-sel" if="{{sel === 1}}">
+            <p class="c-name">{{c1n}}</p>
+            <p class="c-desc">{{c1d}}</p>
+          </div>
+          <div class="card" if="{{sel !== 1}}">
+            <p class="c-name">{{c1n}}</p>
+            <p class="c-desc">{{c1d}}</p>
+          </div>
+        </div>
+        <div class="card-slot">
+          <div class="card-sel" if="{{sel === 2}}">
+            <p class="c-name">{{c2n}}</p>
+            <p class="c-desc">{{c2d}}</p>
+          </div>
+          <div class="card" if="{{sel !== 2}}">
+            <p class="c-name">{{c2n}}</p>
+            <p class="c-desc">{{c2d}}</p>
+          </div>
+        </div>
+      </div>
+      <p class="up-hint">表冠选择 · 点击确认</p>
+    </div>
+
+    <div class="overlay" if="{{overVisible}}" on:touchend="onTap">
+      <p class="over-title">RUN OVER</p>
+      <p class="over-line">WAVE {{overWave}}</p>
+      <p class="over-line">SCORE {{overScore}}</p>
+      <p class="over-line2">KILLS {{overKills}}</p>
+      <p class="over-unlock" if="{{hasUnlock}}">{{unlockText}}</p>
+      <p class="over-hint">点击返回</p>
+    </div>
+
+    <div class="overlay" if="{{achVisible}}" on:touchend="onTap">
+      <p class="ach-title">成就 {{achCount}}/{{achTotal}}</p>
+      <p class="ach-line" for="a in achLines">{{a}}</p>
+      <p class="over-hint">点击返回</p>
+    </div>
+
+    <div class="toast" if="{{toastVisible}}">
+      <p class="toast-text">{{toast}}</p>
+    </div>
+  </div>
+</template>
+
+<style>
+  .page {
+    width: 466px;
+    height: 466px;
+    background-color: #05070d;
+  }
+  .world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 466px;
+    height: 466px;
+    background-color: #05070d;
+  }
+  .ring {
+    position: absolute;
+    border: 1px solid #0a1a24;
+    border-radius: 50%;
+  }
+  .vignette {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    width: 450px;
+    height: 450px;
+    border: 14px solid #020408;
+    border-radius: 225px;
+  }
+  .sprite {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .hud {
+    position: absolute;
+    left: 74px;
+    top: 68px;
+  }
+  .hud-wave {
+    font-size: 22px;
+    color: #7fb8c9;
+  }
+  .hud-line {
+    font-size: 16px;
+    color: #3f6f80;
+    margin-top: 1px;
+  }
+  .combo {
+    position: absolute;
+    left: 348px;
+    top: 72px;
+    font-size: 28px;
+    color: #ffd166;
+  }
+  .banner {
+    position: absolute;
+    left: 0;
+    top: 196px;
+    width: 466px;
+  }
+  .banner-text {
+    font-size: 40px;
+    color: #e8eef2;
+    text-align: center;
+  }
+  .ult {
+    position: absolute;
+    left: 193px;
+    top: 360px;
+    width: 80px;
+    height: 80px;
+  }
+  .ult-label {
+    font-size: 13px;
+    color: #6f6250;
+    text-align: center;
+    margin-top: 33px;
+  }
+  .ult-ready {
+    font-size: 15px;
+    color: #ffd166;
+  }
+  .overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 466px;
+    height: 466px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #05070d;
+  }
+  .title {
+    font-size: 44px;
+    color: #e8eef2;
+  }
+  .sub {
+    font-size: 16px;
+    color: #4d7c8f;
+    margin-top: 8px;
+  }
+  .weapon-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 26px;
+  }
+  .weapon-name {
+    font-size: 30px;
+    color: #ffd166;
+  }
+  .weapon-desc {
+    font-size: 15px;
+    color: #7fb8c9;
+    margin-top: 4px;
+  }
+  .weapon-hint {
+    font-size: 14px;
+    color: #3f6f80;
+    margin-top: 10px;
+  }
+  .weapon-hint2 {
+    font-size: 13px;
+    color: #2f5666;
+    margin-top: 4px;
+  }
+  .ach-btn {
+    position: absolute;
+    left: 160px;
+    top: 388px;
+    width: 146px;
+    height: 40px;
+    border: 2px solid #1e3a4a;
+    border-radius: 20px;
+  }
+  .ach-btn-text {
+    font-size: 15px;
+    color: #7fb8c9;
+    text-align: center;
+    margin-top: 9px;
+  }
+  .up-title {
+    font-size: 30px;
+    color: #e8eef2;
+  }
+  .cards {
+    display: flex;
+    flex-direction: row;
+    margin-top: 16px;
+  }
+  .card-slot {
+    width: 122px;
+    height: 170px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    width: 110px;
+    height: 158px;
+    border: 2px solid #1e3a4a;
+    border-radius: 10px;
+    background-color: #0a141c;
+    padding: 10px;
+  }
+  .card-sel {
+    width: 110px;
+    height: 158px;
+    border: 4px solid #ffd166;
+    border-radius: 10px;
+    background-color: #141008;
+    padding: 10px;
+  }
+  .c-name {
+    font-size: 18px;
+    color: #e8eef2;
+    text-align: center;
+    margin-top: 12px;
+  }
+  .c-desc {
+    font-size: 13px;
+    color: #7fb8c9;
+    text-align: center;
+    margin-top: 14px;
+  }
+  .up-hint {
+    font-size: 14px;
+    color: #3f6f80;
+    margin-top: 16px;
+  }
+  .over-title {
+    font-size: 40px;
+    color: #ff3b7f;
+  }
+  .over-line {
+    font-size: 26px;
+    color: #e8eef2;
+    margin-top: 8px;
+  }
+  .over-line2 {
+    font-size: 18px;
+    color: #7fb8c9;
+    margin-top: 4px;
+  }
+  .over-unlock {
+    font-size: 16px;
+    color: #ffd166;
+    margin-top: 12px;
+  }
+  .over-hint {
+    font-size: 16px;
+    color: #3f6f80;
+    margin-top: 20px;
+  }
+  .ach-title {
+    font-size: 26px;
+    color: #e8eef2;
+  }
+  .ach-line {
+    font-size: 15px;
+    color: #7fb8c9;
+    margin-top: 6px;
+  }
+  .toast {
+    position: absolute;
+    left: 0;
+    top: 300px;
+    width: 466px;
+  }
+  .toast-text {
+    font-size: 17px;
+    color: #ffd166;
+    text-align: center;
+  }
+</style>
+
+<script>
+  import storage from '@system.storage'
+
+  const W = 466
+  const H = 466
+  const CX = 233
+  const CY = 233
+  const PI2 = Math.PI * 2
+  const AIM_ASSIST = true
+  const DEMO_AIM = false
+
+  const WEAPONS = [
+    { id: 'pulse', name: '脉冲炮', desc: '稳定单发，均衡之选', cd: 0.28, dmg: 1, n: 1, spread: 0, pierce: 0, speed: 8.2, color: '#3ce8ff' },
+    { id: 'scatter', name: '散射炮', desc: '三发扇形，近距覆盖', cd: 0.42, dmg: 1, n: 3, spread: 0.18, pierce: 0, speed: 7.6, color: '#7dd3c0', unlockWave: 3 },
+    { id: 'laser', name: '激光', desc: '高频穿透光束', cd: 0.2, dmg: 1, n: 1, spread: 0, pierce: 4, speed: 12, color: '#b8f6ff', unlockKills: 80 },
+    { id: 'missile', name: '导弹', desc: '追踪最近的敌人', cd: 0.72, dmg: 2, n: 1, spread: 0, pierce: 0, speed: 4.6, homing: true, color: '#ffd166', unlockBoss: 1 }
+  ]
+
+  const ACH = [
+    { id: 'first', name: '初次击杀', check: s => s.kills >= 1 },
+    { id: 'k100', name: '猎手', check: s => s.kills >= 100 },
+    { id: 'k500', name: '清道夫', check: s => s.kills >= 500 },
+    { id: 'w5', name: '深入', check: s => s.bestWave >= 5 },
+    { id: 'w10', name: '深渊', check: s => s.bestWave >= 10 },
+    { id: 'boss1', name: '屠龙者', check: s => s.bossKills >= 1 },
+    { id: 'ult10', name: '过载', check: s => s.ultUses >= 10 },
+    { id: 'allw', name: '军火库', check: s => s.weapons.length >= 4 }
+  ]
+
+  const UPGRADES = [
+    { id: 'rate', name: '超频', desc: '射速 +25%' },
+    { id: 'dmg', name: '高能弹头', desc: '伤害 +1' },
+    { id: 'multi', name: '多重弹幕', desc: '弹丸 +1' },
+    { id: 'pierce', name: '穿透', desc: '穿透 +1' },
+    { id: 'crit', name: '暴击', desc: '15% 双倍伤害' },
+    { id: 'armor', name: '护甲', desc: '生命上限 +1' },
+    { id: 'drone', name: '僚机', desc: '环绕自动开火' },
+    { id: 'slow', name: '减速场', desc: '敌人移速 -20%' },
+    { id: 'boom', name: '爆炸弹', desc: '击杀产生爆炸' }
+  ]
+
+  function defaultSave() {
+    return { bestWave: 0, kills: 0, runs: 0, ultUses: 0, bossKills: 0, weapons: ['pulse'], ach: {} }
+  }
+
+  export default {
+    data: {
+      hudVisible: false,
+      menuVisible: true,
+      upgradeVisible: false,
+      overVisible: false,
+      achVisible: false,
+      bannerVisible: false,
+      ultVisible: false,
+      toastVisible: false,
+      ultReady: false,
+      comboVisible: false,
+      wave: 1,
+      score: 0,
+      hp: 5,
+      combo: 1,
+      bestWave: 0,
+      totalKills: 0,
+      weaponName: '脉冲炮',
+      weaponDesc: '稳定单发，均衡之选',
+      achCount: 0,
+      achTotal: 8,
+      c0n: '', c0d: '', c1n: '', c1d: '', c2n: '', c2d: '',
+      sel: 1,
+      banner: '',
+      toast: '',
+      overWave: 0,
+      overScore: 0,
+      overKills: 0,
+      unlockText: '',
+      hasUnlock: false,
+      achLines: [],
+      sprites: []
+    },
+
+    timer: null,
+    ctx: null,
+    mode: 'menu',
+    save: null,
+    angle: -Math.PI / 2,
+    t: 0,
+    stars: [],
+    menuIdx: 0,
+    menuWeapon: null,
+
+    fireCd: 0,
+    bullets: [],
+    enemies: [],
+    enemyBullets: [],
+    particles: [],
+    rings: [],
+    spawnQueue: [],
+    spawnT: 0,
+    kills: 0,
+    combo: 1,
+    comboT: 0,
+    ultCharge: 0,
+    cdMul: 1,
+    dmgAdd: 0,
+    extra: 0,
+    pierceAdd: 0,
+    crit: 0,
+    drones: 0,
+    slow: 0,
+    boom: 0,
+    maxHp: 5,
+    droneCd: 0,
+    shake: 0,
+    toastQueue: [],
+    lastUnlock: '',
+    bannerTimer: null,
+    toastTimer: null,
+    lastTap: 0,
+    lastEvt: 0,
+
+    onReady() {
+      this.save = this.loadSave()
+      this.stars = this.makeStars()
+      this.refreshMenu()
+      this.mode = 'menu'
+      this.menuVisible = true
+      this.timer = setInterval(() => this.tick(), 40)
+    },
+
+    onHide() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+
+    onShow() {
+      if (!this.timer) {
+        this.timer = setInterval(() => this.tick(), 40)
+      }
+    },
+
+    loadSave() {
+      try {
+        const s = storage.get('save')
+        if (s && s.weapons) return s
+      } catch (e) {}
+      return defaultSave()
+    },
+
+    saveGame() {
+      try {
+        storage.set('save', this.save)
+      } catch (e) {}
+    },
+
+    makeStars() {
+      const out = []
+      for (let i = 0; i < 14; i++) {
+        const a = Math.random() * PI2
+        const r = 40 + Math.random() * 184
+        out.push({
+          x: CX + Math.cos(a) * r,
+          y: CY + Math.sin(a) * r,
+          r: Math.random() < 0.25 ? 1.6 : 1,
+          c: Math.random() < 0.3 ? '#123a4a' : '#0a2330'
+        })
+      }
+      return out
+    },
+
+    unlockedWeapons() {
+      const out = []
+      for (let i = 0; i < WEAPONS.length; i++) {
+        if (this.save.weapons.indexOf(WEAPONS[i].id) >= 0) out.push(WEAPONS[i])
+      }
+      return out
+    },
+
+    refreshMenu() {
+      const list = this.unlockedWeapons()
+      if (!list.length) return
+      const w = list[this.menuIdx % list.length]
+      this.menuWeapon = w
+      this.weaponName = w.name
+      this.weaponDesc = w.desc
+      this.bestWave = this.save.bestWave
+      this.totalKills = this.save.kills
+      this.achCount = Object.keys(this.save.ach).length
+      this.achTotal = ACH.length
+    },
+
+    cycleWeapon(dir) {
+      const list = this.unlockedWeapons()
+      if (list.length < 2) return
+      this.menuIdx = (this.menuIdx + dir + list.length) % list.length
+      this.refreshMenu()
+    },
+
+    onWheel(e) {
+      if (!e) return
+      const d = e.deltaY
+      if (!d) return
+      if (this.mode === 'play') {
+        let step = d
+        if (step > 1.5) step = 1.5
+        if (step < -1.5) step = -1.5
+        this.angle += step * 0.02
+        while (this.angle > Math.PI) this.angle -= PI2
+        while (this.angle < -Math.PI) this.angle += PI2
+      } else if (this.mode === 'upgrade') {
+        this.sel = (this.sel + (d > 0 ? 1 : -1) + 3) % 3
+      } else if (this.mode === 'menu') {
+        this.cycleWeapon(d > 0 ? 1 : -1)
+      }
+    },
+
+    onTouchStart(e) {
+    },
+
+    onTouchEnd(e) {
+      if (this.mode !== 'play') {
+        if (!this.guard(80)) return
+        this.routeTap()
+        return
+      }
+      const now = Date.now()
+      if (this.lastTap && now - this.lastTap < 480) {
+        this.lastTap = 0
+        this.castUlt()
+      } else {
+        this.lastTap = now
+      }
+    },
+
+    onCanvasTap(e) {
+      if (e && e.stopPropagation) e.stopPropagation()
+      if (this.mode !== 'play') return
+      const now = Date.now()
+      if (this.lastTap && now - this.lastTap < 480) {
+        this.lastTap = 0
+        this.castUlt()
+      } else {
+        this.lastTap = now
+      }
+    },
+
+    guard(ms) {
+      const now = Date.now()
+      if (this.lastEvt && now - this.lastEvt < ms) return false
+      this.lastEvt = now
+      return true
+    },
+
+    routeTap() {
+      if (this.mode === 'menu') this.startRun()
+      else if (this.mode === 'upgrade') this.pickUpgrade()
+      else if (this.mode === 'over') this.backToMenu()
+      else if (this.mode === 'ach') this.closeAch()
+    },
+
+    onTap() {
+      if (this.mode === 'play') return
+      if (!this.guard(80)) return
+      this.routeTap()
+    },
+
+    openAch(e) {
+      if (e && e.stopPropagation) e.stopPropagation()
+      this.mode = 'ach'
+      this.menuVisible = false
+      this.achVisible = true
+      const lines = []
+      for (let i = 0; i < ACH.length; i++) {
+        const a = ACH[i]
+        const got = !!this.save.ach[a.id]
+        lines.push((got ? '✓ ' : '○ ') + a.name + '  ' + a.desc)
+      }
+      this.achLines = lines
+    },
+
+    closeAch() {
+      this.mode = 'menu'
+      this.achVisible = false
+      this.menuVisible = true
+      this.refreshMenu()
+    },
+
+    startRun() {
+      this.mode = 'play'
+      this.menuVisible = false
+      this.hudVisible = true
+      this.ultVisible = true
+      this.overVisible = false
+      this.upgradeVisible = false
+
+      this.angle = -Math.PI / 2
+      this.bullets = []
+      this.enemies = []
+      this.enemyBullets = []
+      this.particles = []
+      this.rings = []
+      this.score = 0
+      this.hp = 5
+      this.maxHp = 5
+      this.kills = 0
+      this.combo = 1
+      this.comboVisible = false
+      this.comboT = 0
+      this.ultCharge = 0
+      this.ultReady = false
+      this.cdMul = 1
+      this.dmgAdd = 0
+      this.extra = 0
+      this.pierceAdd = 0
+      this.crit = 0
+      this.drones = 0
+      this.slow = 0
+      this.boom = 0
+      this.fireCd = 0
+      this.droneCd = 0
+      this.shake = 0
+      this.lastUnlock = ''
+      this.hasUnlock = false
+      this.save.runs++
+      this.saveGame()
+      if (DEMO_AIM) {
+        this.ultCharge = 1
+        this.ultReady = true
+      }
+      this.startWave(1)
+    },
+
+    buildWave(n) {
+      const list = []
+      if (n % 5 === 0) {
+        list.push('boss')
+        for (let i = 0; i < 4; i++) list.push('grunt')
+      } else {
+        const count = Math.min(30, 5 + n * 2)
+        for (let i = 0; i < count; i++) {
+          const r = Math.random()
+          let t = 'grunt'
+          if (n >= 7 && r < 0.10) t = 'gunner'
+          else if (n >= 6 && r < 0.25) t = 'runner'
+          else if (n >= 4 && r < 0.42) t = 'splitter'
+          else if (n >= 3 && r < 0.62) t = 'armored'
+          list.push(t)
+        }
+      }
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const tmp = list[i]
+        list[i] = list[j]
+        list[j] = tmp
+      }
+      return list
+    },
+
+    startWave(n) {
+      this.wave = n
+      this.spawnQueue = this.buildWave(n)
+      this.spawnT = 0.55
+      if (n > this.save.bestWave) {
+        this.save.bestWave = n
+        this.saveGame()
+      }
+      this.showBanner(n % 5 === 0 ? 'BOSS' : 'WAVE ' + n)
+      this.checkAch()
+    },
+
+    showBanner(text) {
+      this.banner = text
+      this.bannerVisible = true
+      if (this.bannerTimer) clearTimeout(this.bannerTimer)
+      this.bannerTimer = setTimeout(() => {
+        this.bannerVisible = false
+      }, 1400)
+    },
+
+    toastMsg(msg) {
+      this.toastQueue.push(msg)
+      this.pumpToast()
+    },
+
+    pumpToast() {
+      if (this.toastVisible) return
+      const msg = this.toastQueue.shift()
+      if (!msg) return
+      this.toast = msg
+      this.toastVisible = true
+      if (this.toastTimer) clearTimeout(this.toastTimer)
+      this.toastTimer = setTimeout(() => {
+        this.toastVisible = false
+        setTimeout(() => this.pumpToast(), 180)
+      }, 1900)
+    },
+
+    unlockWeapon(id) {
+      if (this.save.weapons.indexOf(id) >= 0) return
+      this.save.weapons.push(id)
+      this.saveGame()
+      const w = this.weaponById(id)
+      this.lastUnlock = '解锁武器：' + w.name
+      this.toastMsg('解锁武器：' + w.name)
+      this.checkAch()
+    },
+
+    weaponById(id) {
+      for (let i = 0; i < WEAPONS.length; i++) {
+        if (WEAPONS[i].id === id) return WEAPONS[i]
+      }
+      return WEAPONS[0]
+    },
+
+    checkAch() {
+      let changed = false
+      for (let i = 0; i < ACH.length; i++) {
+        const a = ACH[i]
+        if (!this.save.ach[a.id] && a.check(this.save)) {
+          this.save.ach[a.id] = 1
+          changed = true
+          this.toastMsg('成就解锁：' + a.name)
+        }
+      }
+      if (changed) {
+        this.achCount = Object.keys(this.save.ach).length
+        this.saveGame()
+      }
+    },
+
+    fire() {
+      if (this.mode !== 'play' || this.fireCd > 0) return
+      const w = this.menuWeapon || WEAPONS[0]
+      this.fireCd = w.cd * this.cdMul
+      const n = w.n + this.extra
+      const spread = n > 1 ? (w.spread || 0.2) : 0
+      for (let i = 0; i < n; i++) {
+        const a = this.angle + (i - (n - 1) / 2) * spread
+        const cos = Math.cos(a)
+        const sin = Math.sin(a)
+        this.bullets.push({
+          x: CX + cos * 32,
+          y: CY + sin * 32,
+          vx: cos * w.speed,
+          vy: sin * w.speed,
+          dmg: w.dmg + this.dmgAdd,
+          pierce: w.pierce + this.pierceAdd,
+          color: w.color,
+          homing: !!w.homing,
+          laser: w.id === 'laser',
+          life: 1.5
+        })
+      }
+      for (let i = 0; i < 3; i++) {
+        const cos = Math.cos(this.angle)
+        const sin = Math.sin(this.angle)
+        this.particles.push({
+          x: CX + cos * 38,
+          y: CY + sin * 38,
+          vx: cos * (1 + Math.random() * 2) + (Math.random() - 0.5) * 2,
+          vy: sin * (1 + Math.random() * 2) + (Math.random() - 0.5) * 2,
+          life: 0.16,
+          c: w.color
+        })
+      }
+    },
+
+    onKey(e) {
+      if (!e) return
+      console.info('Turret2 KEY ' + e.key)
+      if (this.mode !== 'play' || this.ultCharge < 1) return
+      if (e.key === 'Fn' || e.key === 'Power' || e.key === 'Enter' || e.key === ' ') {
+        this.castUlt(e)
+      }
+    },
+
+    castUlt(e) {
+      console.info('Turret2 ULT cast')
+      if (this.mode !== 'play' || this.ultCharge < 1) return
+      if (e && e.stopPropagation) e.stopPropagation()
+      this.ultCharge = 0
+      this.ultReady = false
+      this.shake = 0.6
+      this.enemyBullets = []
+      this.rings.push({ x: CX, y: CY, r: 20, life: 0.5, c: '#ffd166' })
+      this.rings.push({ x: CX, y: CY, r: 40, life: 0.6, c: '#ff9f43' })
+      this.rings.push({ x: CX, y: CY, r: 70, life: 0.7, c: '#3ce8ff' })
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const en = this.enemies[i]
+        en.hp -= 6
+        this.burst(en.x, en.y, 6, '#ffd166')
+        if (en.hp <= 0) this.killEnemy(en)
+      }
+      this.save.ultUses++
+      this.saveGame()
+      this.checkAch()
+    },
+
+    spawnEnemy(type) {
+      const a = Math.random() * PI2
+      const r = 252
+      const x = CX + Math.cos(a) * r
+      const y = CY + Math.sin(a) * r
+      const n = this.wave
+      const base = {
+        type: type,
+        x: x,
+        y: y,
+        phase: Math.random() * PI2,
+        fireT: 1.5 + Math.random(),
+        minionT: 4
+      }
+      let e = null
+      if (type === 'grunt') {
+        e = Object.assign(base, { r: 8, hp: 1 + Math.floor(n / 7), speed: 0.44 + n * 0.025 + Math.random() * 0.18, color: '#ff3b7f', score: 10 })
+      } else if (type === 'armored') {
+        e = Object.assign(base, { r: 11, hp: 3 + Math.floor(n / 4), speed: 0.3 + n * 0.015, color: '#ff9f43', score: 25 })
+      } else if (type === 'splitter') {
+        e = Object.assign(base, { r: 10, hp: 2, speed: 0.38 + n * 0.015, color: '#b06bff', score: 20, split: true })
+      } else if (type === 'runner') {
+        e = Object.assign(base, { r: 6, hp: 1, speed: 0.8 + n * 0.03, color: '#5ce1e6', score: 15, zig: true })
+      } else if (type === 'gunner') {
+        e = Object.assign(base, { r: 9, hp: 2, speed: 0.45, color: '#ff5c5c', score: 25, gun: true, stopR: 150 })
+      } else if (type === 'boss') {
+        e = Object.assign(base, {
+          r: 26, hp: 28 + 10 * Math.floor(n / 5), speed: 0.2,
+          color: '#ff2d55', score: 500, boss: true, stopR: 158
+        })
+      }
+      if (e) {
+        e.maxHp = e.hp
+        this.enemies.push(e)
+      }
+    },
+
+    spawnMinion(x, y) {
+      this.enemies.push({
+        type: 'grunt', x: x + (Math.random() - 0.5) * 30, y: y + (Math.random() - 0.5) * 30,
+        r: 6, hp: 1, maxHp: 1, speed: 0.55, color: '#ff3b7f', score: 10,
+        phase: 0, fireT: 2, minionT: 9
+      })
+    },
+
+    tick() {
+      this.t += 0.033
+      if (this.mode === 'play') this.update(0.033)
+      this.draw()
+    },
+
+    update(dt) {
+      if (this.fireCd > 0) this.fireCd -= dt
+      if (this.shake > 0) this.shake -= dt
+      if (this.comboT > 0) {
+        this.comboT -= dt
+        if (this.comboT <= 0) {
+          this.combo = 1
+          this.comboVisible = false
+        }
+      }
+
+      // spawn
+      if (this.spawnQueue.length > 0 && this.enemies.length < 12) {
+        this.spawnT -= dt
+        if (this.spawnT <= 0) {
+          this.spawnEnemy(this.spawnQueue.shift())
+          this.spawnT = Math.max(0.28, 0.75 - this.wave * 0.02) + Math.random() * 0.18
+        }
+      }
+
+      // auto fire + aim assist
+      if (this.enemies.length > 0) {
+        if (DEMO_AIM) {
+          let best = null
+          let bd = 1e9
+          for (let i = 0; i < this.enemies.length; i++) {
+            const e = this.enemies[i]
+            const dx = e.x - CX
+            const dy = e.y - CY
+            const dd = dx * dx + dy * dy
+            if (dd < bd) { bd = dd; best = e }
+          }
+          if (best) this.angle = Math.atan2(best.y - CY, best.x - CX)
+          if (this.fireCd <= 0) this.fire()
+        } else {
+          if (AIM_ASSIST) {
+            let best = null
+            let bd = 1e9
+            for (let i = 0; i < this.enemies.length; i++) {
+              const e = this.enemies[i]
+              const dx = e.x - CX
+              const dy = e.y - CY
+              const dd = dx * dx + dy * dy
+              if (dd < bd) { bd = dd; best = e }
+            }
+            if (best) {
+              const target = Math.atan2(best.y - CY, best.x - CX)
+              let diff = target - this.angle
+              while (diff > Math.PI) diff -= PI2
+              while (diff < -Math.PI) diff += PI2
+              if (Math.abs(diff) < 0.20) this.angle += diff * 0.22
+            }
+          }
+          if (this.fireCd <= 0) this.fire()
+        }
+      }
+
+      const slowMul = 1 - this.slow
+
+      // enemies
+      for (let i = this.enemies.length - 1; i >= 0; i--) {
+        const e = this.enemies[i]
+        const dx = CX - e.x
+        const dy = CY - e.y
+        const d = Math.sqrt(dx * dx + dy * dy) || 1
+        const sp = e.speed * slowMul * dt * 60
+
+        if (e.boss) {
+          if (d > e.stopR) {
+            e.x += dx / d * sp
+            e.y += dy / d * sp
+          } else {
+            e.x += -dy / d * sp * 0.8
+            e.y += dx / d * sp * 0.8
+          }
+          e.fireT -= dt
+          if (e.fireT <= 0) {
+            e.fireT = 2.6
+            const n = 8
+            for (let k = 0; k < n; k++) {
+              const a = k * PI2 / n + this.t * 0.2
+              if (this.enemyBullets.length < 14) {
+                this.enemyBullets.push({
+                  x: e.x, y: e.y,
+                  vx: Math.cos(a) * 1.5, vy: Math.sin(a) * 1.5, hp: 1
+                })
+              }
+            }
+          }
+          e.minionT -= dt
+          if (e.minionT <= 0) {
+            e.minionT = 6
+            this.spawnMinion(e.x, e.y)
+            this.spawnMinion(e.x, e.y)
+          }
+        } else if (e.gun) {
+          if (d > e.stopR) {
+            e.x += dx / d * sp
+            e.y += dy / d * sp
+          } else {
+            e.fireT -= dt
+            if (e.fireT <= 0) {
+              e.fireT = 2.2
+              if (this.enemyBullets.length < 14) {
+                this.enemyBullets.push({
+                  x: e.x, y: e.y,
+                  vx: dx / d * 2.2, vy: dy / d * 2.2, hp: 1
+                })
+              }
+            }
+          }
+        } else if (e.zig) {
+          e.phase += dt * 5
+          e.x += (dx / d * sp) + (-dy / d) * Math.sin(e.phase) * sp * 0.9
+          e.y += (dy / d * sp) + (dx / d) * Math.sin(e.phase) * sp * 0.9
+        } else {
+          e.x += dx / d * sp
+          e.y += dy / d * sp
+        }
+
+        if (d < 28 && !e.boss) {
+          this.enemies.splice(i, 1)
+          this.burst(e.x, e.y, 8, '#ff3b7f')
+          this.damagePlayer(1)
+        }
+      }
+
+      // player bullets
+      for (let i = this.bullets.length - 1; i >= 0; i--) {
+        const b = this.bullets[i]
+        if (b.homing) {
+          let best = null
+          let bd = 1e9
+          for (let j = 0; j < this.enemies.length; j++) {
+            const e = this.enemies[j]
+            const dx = e.x - b.x
+            const dy = e.y - b.y
+            const dd = dx * dx + dy * dy
+            if (dd < bd) { bd = dd; best = e }
+          }
+          if (best) {
+            const dx = best.x - b.x
+            const dy = best.y - b.y
+            const dd = Math.sqrt(dx * dx + dy * dy) || 1
+            b.vx = b.vx * 0.92 + (dx / dd) * 2.2
+            b.vy = b.vy * 0.92 + (dy / dd) * 2.2
+            const sp = Math.sqrt(b.vx * b.vx + b.vy * b.vy) || 1
+            b.vx = b.vx / sp * 4.8
+            b.vy = b.vy / sp * 4.8
+          }
+        }
+        b.x += b.vx * dt * 60
+        b.y += b.vy * dt * 60
+        b.life -= dt
+        const dx = b.x - CX
+        const dy = b.y - CY
+        if (b.life <= 0 || dx * dx + dy * dy > 300 * 300) {
+          this.bullets.splice(i, 1)
+          continue
+        }
+
+        let hit = false
+        for (let j = this.enemies.length - 1; j >= 0; j--) {
+          const e = this.enemies[j]
+          const ex = b.x - e.x
+          const ey = b.y - e.y
+          if (ex * ex + ey * ey < (e.r + 6) * (e.r + 6)) {
+            let dmg = b.dmg
+            if (this.crit > 0 && Math.random() < this.crit) {
+              dmg *= 2
+              this.rings.push({ x: e.x, y: e.y, r: 4, life: 0.18, c: '#ffd166' })
+            }
+            e.hp -= dmg
+            if (b.pierce > 0) {
+              b.pierce--
+            } else {
+              hit = true
+            }
+            if (e.hp <= 0) this.killEnemy(e)
+            break
+          }
+        }
+        if (hit) this.bullets.splice(i, 1)
+
+        // bullets can shoot down enemy bullets
+        if (!hit) {
+          for (let j = this.enemyBullets.length - 1; j >= 0; j--) {
+            const eb = this.enemyBullets[j]
+            const ex = b.x - eb.x
+            const ey = b.y - eb.y
+            if (ex * ex + ey * ey < 100) {
+              this.enemyBullets.splice(j, 1)
+              this.bullets.splice(i, 1)
+              this.score += 5
+              this.burst(eb.x, eb.y, 4, '#ffd166')
+              break
+            }
+          }
+        }
+      }
+
+      // enemy bullets
+      for (let i = this.enemyBullets.length - 1; i >= 0; i--) {
+        const eb = this.enemyBullets[i]
+        eb.x += eb.vx * dt * 60
+        eb.y += eb.vy * dt * 60
+        const dx = eb.x - CX
+        const dy = eb.y - CY
+        if (dx * dx + dy * dy > 300 * 300) {
+          this.enemyBullets.splice(i, 1)
+        } else if (dx * dx + dy * dy < 26 * 26) {
+          this.enemyBullets.splice(i, 1)
+          this.damagePlayer(1)
+        }
+      }
+
+      // drones
+      if (this.drones > 0) {
+        this.droneCd -= dt
+        if (this.droneCd <= 0 && this.enemies.length > 0) {
+          this.droneCd = 0.7
+          for (let i = 0; i < this.drones; i++) {
+            const a = this.t * 1.8 + i * Math.PI
+            const dx0 = CX + Math.cos(a) * 44
+            const dy0 = CY + Math.sin(a) * 44
+            let best = this.enemies[0]
+            let bd = 1e9
+            for (let j = 0; j < this.enemies.length; j++) {
+              const e = this.enemies[j]
+              const dx = e.x - dx0
+              const dy = e.y - dy0
+              const dd = dx * dx + dy * dy
+              if (dd < bd) { bd = dd; best = e }
+            }
+            const dx = best.x - dx0
+            const dy = best.y - dy0
+            const dd = Math.sqrt(dx * dx + dy * dy) || 1
+            this.bullets.push({
+              x: dx0, y: dy0,
+              vx: dx / dd * 9, vy: dy / dd * 9,
+              dmg: 1, pierce: 0, color: '#7dd3c0', life: 1.2
+            })
+          }
+        }
+      }
+
+      // particles & rings
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i]
+        p.x += p.vx * dt * 60
+        p.y += p.vy * dt * 60
+        p.vx *= 0.95
+        p.vy *= 0.95
+        p.life -= dt
+        if (p.life <= 0) this.particles.splice(i, 1)
+      }
+      for (let i = this.rings.length - 1; i >= 0; i--) {
+        const g = this.rings[i]
+        g.r += dt * 240
+        g.life -= dt
+        if (g.life <= 0) this.rings.splice(i, 1)
+      }
+
+      if (this.spawnQueue.length === 0 && this.enemies.length === 0) {
+        this.onWaveClear()
+      }
+    },
+
+    killEnemy(e) {
+      const idx = this.enemies.indexOf(e)
+      if (idx >= 0) this.enemies.splice(idx, 1)
+      const mult = Math.min(3, 1 + (this.combo - 1) * 0.1)
+      this.score += Math.round(e.score * mult)
+      this.kills++
+      this.combo++
+      this.comboT = 2
+      this.comboVisible = true
+      this.combo = this.combo
+      this.ultCharge = Math.min(1, this.ultCharge + 0.05)
+      this.ultReady = this.ultCharge >= 1
+      this.burst(e.x, e.y, e.r > 9 ? 14 : 9, e.color)
+      this.rings.push({
+        x: e.x, y: e.y, r: 6, life: 0.3,
+        c: e.r > 9 ? '#ffd166' : e.color
+      })
+
+      if (e.split) {
+        this.spawnMinion(e.x, e.y)
+        this.spawnMinion(e.x, e.y)
+      }
+      if (this.boom > 0) {
+        for (let i = this.enemies.length - 1; i >= 0; i--) {
+          const o = this.enemies[i]
+          const dx = o.x - e.x
+          const dy = o.y - e.y
+          if (dx * dx + dy * dy < 45 * 45) {
+            o.hp -= this.boom
+            if (o.hp <= 0) this.killEnemy(o)
+          }
+        }
+      }
+      if (e.boss) {
+        this.save.bossKills++
+        this.saveGame()
+        this.unlockWeapon('missile')
+        this.shake = 0.5
+        for (let i = 0; i < 3; i++) {
+          this.rings.push({ x: e.x, y: e.y, r: 10 + i * 16, life: 0.5 + i * 0.1, c: '#ffd166' })
+        }
+      }
+
+      this.save.kills++
+      if (this.save.kills >= 80) this.unlockWeapon('laser')
+      if (this.save.bestWave >= 3) this.unlockWeapon('scatter')
+      this.checkAch()
+    },
+
+    damagePlayer(n) {
+      this.hp -= n
+      this.shake = 0.35
+      if (this.hp <= 0) {
+        this.hp = 0
+        this.gameOver()
+      }
+    },
+
+    gameOver() {
+      this.mode = 'over'
+      this.hudVisible = false
+      this.ultVisible = false
+      this.upgradeVisible = false
+      this.overVisible = true
+      this.comboVisible = false
+      if (this.wave > this.save.bestWave) this.save.bestWave = this.wave
+      this.saveGame()
+      this.overWave = this.wave
+      this.overScore = this.score
+      this.overKills = this.kills
+      this.unlockText = this.lastUnlock
+      this.hasUnlock = !!this.lastUnlock
+      this.checkAch()
+    },
+
+    backToMenu() {
+      this.mode = 'menu'
+      this.overVisible = false
+      this.menuVisible = true
+      this.refreshMenu()
+    },
+
+    onWaveClear() {
+      this.score += 50
+      this.mode = 'upgrade'
+      this.upgradeVisible = true
+      this.ultVisible = false
+      this.enemyBullets = []
+      this.rollUpgrades()
+    },
+
+    rollUpgrades() {
+      const pool = UPGRADES.slice()
+      const picked = []
+      for (let i = 0; i < 3; i++) {
+        const k = Math.floor(Math.random() * pool.length)
+        picked.push(pool.splice(k, 1)[0])
+      }
+      this.c0n = picked[0].name
+      this.c0d = picked[0].desc
+      this.c1n = picked[1].name
+      this.c1d = picked[1].desc
+      this.c2n = picked[2].name
+      this.c2d = picked[2].desc
+      this.picked = picked
+      this.sel = 1
+    },
+
+    pickUpgrade() {
+      const u = this.picked[this.sel]
+      if (!u) return
+      if (u.id === 'rate') this.cdMul *= 0.78
+      else if (u.id === 'dmg') this.dmgAdd += 1
+      else if (u.id === 'multi') this.extra += 1
+      else if (u.id === 'pierce') this.pierceAdd += 1
+      else if (u.id === 'crit') this.crit = Math.min(0.6, this.crit + 0.15)
+      else if (u.id === 'armor') {
+        this.maxHp += 1
+        this.hp = Math.min(this.maxHp, this.hp + 1)
+        this.hp = this.hp
+      } else if (u.id === 'drone') this.drones += 1
+      else if (u.id === 'slow') this.slow = Math.min(0.6, this.slow + 0.2)
+      else if (u.id === 'boom') this.boom += 1
+
+      this.upgradeVisible = false
+      this.ultVisible = true
+      this.mode = 'play'
+      this.startWave(this.wave + 1)
+    },
+
+    burst(x, y, n, color) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * PI2
+        const s = 1 + Math.random() * 2.6
+        this.particles.push({
+          x: x, y: y,
+          vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+          life: 0.22 + Math.random() * 0.3,
+          c: Math.random() < 0.3 ? '#ffd166' : color
+        })
+      }
+    },
+
+    draw() {
+      if (this.mode !== 'play') {
+        this.sprites = []
+        return
+      }
+      this.sprites = this.buildSprites()
+    },
+
+    buildSprites() {
+      const out = []
+      const add = (x, y, w, h, bg, rad, border) => {
+        let st = 'left:' + Math.round(x) + 'px;top:' + Math.round(y) + 'px;width:' +
+                 Math.round(w) + 'px;height:' + Math.round(h) + 'px;'
+        if (bg) st += 'background-color:' + bg + ';'
+        if (border) st += 'border:' + border + ';'
+        out.push(st)
+      }
+
+      for (let i = 0; i < this.stars.length; i++) {
+        const st = this.stars[i]
+        add(st.x - st.r, st.y - st.r, st.r * 2, st.r * 2, st.c, st.r)
+      }
+
+      const sw = this.t * 0.55
+      for (let i = 0; i < 3; i++) {
+        const a = sw - i * 0.13
+        add(CX + Math.cos(a) * 210 - 1, CY + Math.sin(a) * 210 - 1, 3, 3,
+          i === 0 ? '#0d3342' : '#081f28', 2)
+      }
+
+      for (let i = 0; i < 5; i++) {
+        const r = 70 + i * 30
+        add(CX + Math.cos(this.angle) * r - 1.5, CY + Math.sin(this.angle) * r - 1.5,
+          3, 3, '#0e3a4a', 2)
+      }
+
+      const rg = Math.min(this.rings.length, 2)
+      for (let i = 0; i < rg; i++) {
+        const g = this.rings[i]
+        add(g.x - g.r, g.y - g.r, g.r * 2, g.r * 2,
+          g.life > 0.2 ? g.c : '#4a2030', g.r)
+        if (g.r > 4) {
+          add(g.x - g.r + 3, g.y - g.r + 3, (g.r - 3) * 2, (g.r - 3) * 2,
+            '#05070d', g.r - 3)
+        }
+      }
+
+      const pn = Math.min(this.particles.length, 8)
+      for (let i = 0; i < pn; i++) {
+        const p = this.particles[i]
+        add(p.x - 2, p.y - 2, 4, 4, p.life > 0.18 ? p.c : '#5a2030', 2)
+      }
+
+      const en = Math.min(this.enemies.length, 12)
+      for (let i = 0; i < en; i++) {
+        const e = this.enemies[i]
+        let border = ''
+        if (e.type === 'armored') border = '2px solid #ffd166'
+        else if (e.boss) border = '3px solid #ffd7e2'
+        add(e.x - e.r, e.y - e.r, e.r * 2, e.r * 2, e.color, e.r, border)
+        if (e.boss) {
+          add(e.x - e.r * 0.36, e.y - e.r * 0.36, e.r * 0.72, e.r * 0.72,
+            '#ffd7e2', e.r * 0.36)
+        }
+      }
+
+      const bn = Math.min(this.bullets.length, 16)
+      for (let i = 0; i < bn; i++) {
+        const b = this.bullets[i]
+        add(b.x - 2.5, b.y - 2.5, 5, 5, b.color, 3)
+      }
+
+      const ebn = Math.min(this.enemyBullets.length, 14)
+      for (let i = 0; i < ebn; i++) {
+        const eb = this.enemyBullets[i]
+        add(eb.x - 4, eb.y - 4, 8, 8, '#ff5c5c', 4)
+      }
+
+      // turret
+      add(CX - 26, CY - 26, 52, 52, '#08222b', 26)
+      add(CX - 18, CY - 18, 36, 36, '#0b2a36', 18)
+      add(CX - 12, CY - 12, 24, 24, '#0f4a5c', 12)
+      add(CX - 6, CY - 6, 12, 12, '#3ce8ff', 6)
+
+      const cos = Math.cos(this.angle)
+      const sin = Math.sin(this.angle)
+      add(CX + cos * 222 - 3, CY + sin * 222 - 3, 6, 6, '#b8f6ff', 3)
+      for (let i = 0; i < 5; i++) {
+        const r = 20 + i * 7
+        const d = 3.2 - i * 0.45
+        add(CX + cos * r - d, CY + sin * r - d, d * 2, d * 2,
+          i < 4 ? '#3ce8ff' : '#b8f6ff', d)
+      }
+
+      // ult charge bar
+      add(CX - 22, CY + 34, 44, 4, '#0a2530', 2)
+      if (this.ultCharge > 0) {
+        add(CX - 22, CY + 34, 44 * this.ultCharge, 4,
+          this.ultReady ? '#ffd166' : '#2a5a6a', 2)
+      }
+
+      let boss = null
+      for (let i = 0; i < this.enemies.length; i++) {
+        if (this.enemies[i].boss) boss = this.enemies[i]
+      }
+      if (boss) {
+        const p = Math.max(0, boss.hp / boss.maxHp)
+        add(CX - 100, 56, 200, 6, '#1a0a10', 3)
+        add(CX - 100, 56, 200 * p, 6, '#ff2d55', 3)
+      }
+
+      const dn = Math.min(this.drones, 2)
+      for (let i = 0; i < dn; i++) {
+        const a = this.t * 1.8 + i * Math.PI
+        add(CX + Math.cos(a) * 44 - 6, CY + Math.sin(a) * 44 - 6, 12, 12,
+          '#7dd3c0', 6)
+      }
+
+      return out
+    }
+  }
+</script>
+

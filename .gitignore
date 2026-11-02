@@ -1,0 +1,25 @@
+# 构建产物
+.glyphix-work/
+dist/
+build/
+*.rpk
+*.pkg
+
+# 依赖
+node_modules/
+.toolchain/
+
+# 密钥与本地凭据（绝不入库）
+*key*
+!apps/**/build.sh
+!docs/**/*key*
+.env
+.env.*
+
+# 安装器 / 二进制（版权或体积原因不入库）
+*.apk
+tools/ftprobe/
+
+# 系统
+.DS_Store
+Thumbs.db

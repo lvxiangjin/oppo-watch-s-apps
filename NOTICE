@@ -1,0 +1,37 @@
+# NOTICE / 第三方资源
+
+本仓库包含或引用了以下第三方资源。它们遵循各自的许可证，不适用本仓库的 MIT 许可。
+
+## 1. chengchengking/oppo-watch-s-sideload
+
+- 地址：https://github.com/chengchengking/oppo-watch-s-sideload
+- 许可证：MIT
+- 本仓库使用的部分：
+  - `文档/上游资料/DEV_GUIDE.md`、`PKG_FORMAT.md`、`SOURCES.md`
+  - `文档/上游资料/findings/`（协议逆向档案）
+  - `应用/二维码示例/`（二维码示例）
+  - `工具/ows.py`、`工具/pkg_tool.py`
+  - `设备配置/oppo-rtos-watch.yml`
+- 说明：上游文档中的路径、脚本行号等按其原仓库结构编写，移植到本仓库后可能需要调整。
+
+## 2. purrrock/PurrLaunch
+
+- 地址：https://github.com/purrrock/PurrLaunch
+- 许可证：MIT
+- 本仓库未包含其源码；仅在文档中引用其思路（占位 `com.xfaith.woodenfish` 获取桌面入口）。
+
+## 3. 瑰元助手（Glyphix Assistant）
+
+- 发布页：https://www.pgyer.com/glyphix-assistant
+- 包名：`com.glyphix.assistant`
+- 版权归其作者所有。**本仓库不分发其 APK**，请从发布页获取。
+- 本项目仅在 v1.2 上验证；v1.3 未做回归测试。
+
+## 4. Glyphix 官方文档
+
+- 地址：https://github.com/glyphix-os/web-docs
+- 用于查询框架、组件、系统 API 的行为。
+
+## 5. OPPO / Glyphix 商标
+
+OPPO、ColorOS、Glyphix 等商标归其各自权利人所有。本仓库不含任何厂商专有代码。

@@ -1,0 +1,217 @@
+<template>
+  <div class="page" on:wheel="onWheel($event)" on:click="onTap">
+    <div class="pick" if="{{picking}}">
+      <p class="brand">AI 塔罗</p>
+      <div class="cards">
+        <div class="slot">
+          <div class="card-on" if="{{sel === 0}}"><p class="glyph">◆</p></div>
+          <div class="card-off" if="{{sel !== 0}}"><p class="glyph">◆</p></div>
+        </div>
+        <div class="slot">
+          <div class="card-on" if="{{sel === 1}}"><p class="glyph">◆</p></div>
+          <div class="card-off" if="{{sel !== 1}}"><p class="glyph">◆</p></div>
+        </div>
+        <div class="slot">
+          <div class="card-on" if="{{sel === 2}}"><p class="glyph">◆</p></div>
+          <div class="card-off" if="{{sel !== 2}}"><p class="glyph">◆</p></div>
+        </div>
+      </div>
+      <p class="hint">转动表冠选牌 · 点击翻开</p>
+    </div>
+
+    <div class="face" if="{{rolling}}">
+      <p class="card-name">{{cardName}}</p>
+      <p class="orient">{{orient}}</p>
+      <p class="reading">{{reading}}</p>
+      <p class="hint">{{hint}}</p>
+    </div>
+  </div>
+</template>
+
+<style>
+  .page {
+    width: 466px;
+    height: 466px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #0a0805;
+  }
+
+  .pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .brand {
+    font-size: 26px;
+    color: #d4af5f;
+    margin-bottom: 18px;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .slot {
+    width: 112px;
+    height: 152px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-on {
+    width: 100px;
+    height: 146px;
+    border: 4px solid #f0cd78;
+    border-radius: 12px;
+    background-color: #221a0d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-off {
+    width: 90px;
+    height: 136px;
+    border: 2px solid #5d4d2c;
+    border-radius: 10px;
+    background-color: #120e08;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .glyph {
+    font-size: 36px;
+    color: #d4af5f;
+  }
+
+  .face {
+    width: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-name {
+    font-size: 46px;
+    color: #f0cd78;
+  }
+
+  .orient {
+    font-size: 24px;
+    color: #8a7a5c;
+    margin-top: 4px;
+  }
+
+  .reading {
+    font-size: 24px;
+    color: #f2ead8;
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  .hint {
+    font-size: 18px;
+    color: #6f6250;
+    margin-top: 18px;
+  }
+</style>
+
+<script>
+  import config from './config.js'
+  import cards from './cards.js'
+  import fetch from '@system.fetch'
+
+  export default {
+    data: {
+      picking: true,
+      rolling: false,
+      sel: 1,
+      cardName: '',
+      orient: '',
+      reading: '',
+      hint: ''
+    },
+    busy: false,
+
+    onWheel(e) {
+      if (!this.picking || !e) return
+      const d = e.deltaY
+      if (!d) return
+      this.sel = (this.sel + (d > 0 ? 1 : -1) + 3) % 3
+    },
+
+    onTap() {
+      if (this.picking) {
+        this.draw()
+      } else if (!this.busy) {
+        this.reset()
+      }
+    },
+
+    reset() {
+      this.picking = true
+      this.rolling = false
+      this.reading = ''
+      this.hint = ''
+    },
+
+    async draw() {
+      if (this.busy) return
+      this.busy = true
+
+      const card = cards[Math.floor(Math.random() * cards.length)]
+      const orient = Math.random() < 0.5 ? '正位' : '逆位'
+      this.cardName = card.name
+      this.orient = orient
+      this.picking = false
+      this.rolling = true
+      this.reading = '占卜中…'
+      this.hint = ''
+
+      try {
+        const prompt = '你是一位言简意赅的塔罗师。用户抽到「' + card.name + '（' + orient +
+          '）」。请用不超过50个汉字，给出一句今天的具体指引。语气温和但有力量，' +
+          '不要解释牌义，不要客套，不要分段。'
+        const r = await fetch.fetch({
+          url: config.apiUrl,
+          method: 'POST',
+          header: {
+            'Authorization': 'Bearer ' + config.apiKey,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          data: {
+            model: config.model,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: config.maxTokens,
+            temperature: config.temperature
+          },
+          responseType: 'json',
+          timeout: config.requestTimeout
+        })
+        if (!r || r.code !== 200) throw new Error('HTTP ' + (r && r.code))
+        let d = r.data
+        if (typeof d === 'string') d = JSON.parse(d)
+        const txt = d && d.choices && d.choices[0] && d.choices[0].message &&
+                    d.choices[0].message.content
+        if (!txt) throw new Error('空回复')
+        this.reading = ('' + txt).trim()
+        console.info('AITarot ok: ' + this.reading)
+      } catch (e) {
+        const msg = (e && e.message) ? e.message : String(e)
+        console.warn('AITarot fail: ' + msg)
+        this.reading = orient === '正位' ? card.up : card.rev
+      } finally {
+        this.hint = '点击再抽一次'
+        this.busy = false
+      }
+    }
+  }
+</script>
