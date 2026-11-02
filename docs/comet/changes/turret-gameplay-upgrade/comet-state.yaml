@@ -1,0 +1,134 @@
+schema: comet.native.v4
+name: turret-gameplay-upgrade
+language: en
+phase: build
+status: active
+state_version: 3
+brief: brief.md
+document_constraints_version: 3
+shape_confirmation_hash: dbc7272a11e79dfb0696987b0f6eaa44fc1c73e684a0433e92ffb33a83a04b48
+spec_changes:
+  - capability: build-system
+    operation: create
+    source: specs/build-system/spec.md
+  - capability: combat-controls
+    operation: create
+    source: specs/combat-controls/spec.md
+  - capability: meta-progression
+    operation: create
+    source: specs/meta-progression/spec.md
+  - capability: waves-enemies
+    operation: create
+    source: specs/waves-enemies/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: building
+  goal_cycle: 1
+  iteration: 1
+  attempt: 0
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: submit-builder-candidate
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A1 槽位收窄：局内持有 6 种不同升级后，再次清关的三选一只出现已持有升级（描述为等级/强化），不出现新种类
+    result: pending
+    reason: null
+  - id: A2
+    source: brief.md
+    text: A2 进化配方：持有配方组件且组件达到要求等级（如超频 3 级 + 暴击）时清关，自动进化并出现进化横幅；进化效果在后续战斗中生效；同一配方不重复进化
+    result: pending
+    reason: null
+  - id: A3
+    source: brief.md
+    text: A3 重抽：升级界面长按可重抽当前三张卡，每局限 2 次，界面文字提示剩余次数；用尽后长按无效果
+    result: pending
+    reason: null
+  - id: A4
+    source: brief.md
+    text: A4 蓄力超载：战斗中长按开始蓄力、松手沿当前瞄准角释放扇形重弹，伤害/弹数随蓄力时长提升；按住超过蓄力上限触发过热（强制低效释放 +
+      超载冷却，冷却期间长按无效）
+    result: pending
+    reason: null
+  - id: A5
+    source: brief.md
+    text: A5 单击锁定：战斗中单击立即锁定最近敌人（出现锁定环，磁吸窗口与吸附速度提升），再次单击切换到次近目标；480ms 内的第二击仍触发大招
+    result: pending
+    reason: null
+  - id: A6
+    source: brief.md
+    text: A6 贴脸奖励：敌人与中心距离 <90px 时被击杀，得分与充能获取翻倍
+    result: pending
+    reason: null
+  - id: A7
+    source: brief.md
+    text: A7 Boss 轮换：第 5/10/15… 波出现 3 种 Boss（堡垒环形弹幕+召唤 / 冲刺蓄力突进 /
+      分裂死亡分裂）之一并按波次轮换，释放强技能前均有可辨识前摇（闪烁或预警）
+    result: pending
+    reason: null
+  - id: A8
+    source: brief.md
+    text: A8 阵型波：非 Boss 波每 3 波为阵型波，波次开始前横幅提示，敌人按阵型（环形同圈 / 斜列扇形 / 快袭连发）进场
+    result: pending
+    reason: null
+  - id: A9
+    source: brief.md
+    text: A9 精英怪：第 8 波起普通怪概率精英化：HP×3、金色描边、分数×3、击杀额外获得充能
+    result: pending
+    reason: null
+  - id: A10
+    source: brief.md
+    text: A10 战斗信息与反馈：HUD 显示剩余敌人数与 HP 点状血条；玩家受击出现红晕反馈，命中敌人出现白闪；Boss 波开始有预警横幅
+    result: pending
+    reason: null
+  - id: A11
+    source: brief.md
+    text: A11 局外里程碑：总击杀 200/500/1000 与 Boss 击杀 3 达成后，各自解锁永久强化并在新局生效；旧存档加载后不丢字段、功能正常
+    result: pending
+    reason: null
+  - id: A12
+    source: brief.md
+    text: A12 每日挑战：主菜单上滑进入每日挑战，使用当日日期派生种子（不同日期序列不同，同日重开序列相同），结算记录当日最佳波数并在菜单可见
+    result: pending
+    reason: null
+  - id: A13
+    source: brief.md
+    text: A13 成就入口：主菜单下滑进入成就页，正确展示成就达成状态，可返回菜单；原有成就数据不丢失
+    result: pending
+    reason: null
+  - id: A14
+    source: brief.md
+    text: A14 性能预算不突破：全部新元素绘制受既有上限约束（敌 12/弹 16/敌弹 14/粒子 8/环 2），tick 仍为 40ms
+    result: pending
+    reason: null
+  - id: A15
+    source: brief.md
+    text: A15 构建通过：`gx build -d oppo-rtos-watch -f` 构建成功产出 bundle.pkg
+    result: pending
+    reason: null
+builder_handoff: null
+blockers: []
+verification: null
+history: []
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pending
+verification_report: null
+archived: false
+created_at: 2026-11-02T06:41:52.134Z

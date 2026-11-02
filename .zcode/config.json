@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "enabled": true,
+    "events": {
+      "PreToolUse": [
+        {
+          "matcher": "Write|Edit",
+          "hooks": [
+            {
+              "type": "process",
+              "command": "node",
+              "args": [
+                "/home/lvz/代码/oppo watch s/.zcode/skills/comet/scripts/comet-hook-router.mjs",
+                "--platform",
+                "zcode",
+                "--project-root",
+                "/home/lvz/代码/oppo watch s"
+              ],
+              "timeoutMs": 60000
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

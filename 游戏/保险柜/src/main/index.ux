@@ -1,0 +1,138 @@
+<template>
+  <div class="page" on:wheel="onWheel($event)">
+    <div class="ring1"></div>
+    <div class="ring2"></div>
+    <p class="num">{{num}}</p>
+    <p class="hint">转动表冠 · 开发中</p>
+    <div class="sprite" for="s in sprites" style="{{s}}"></div>
+  </div>
+</template>
+
+<style>
+  .page {
+    width: 466px;
+    height: 466px;
+    background-color: #0a0805;
+  }
+  .ring1 {
+    position: absolute;
+    left: 83px;
+    top: 83px;
+    width: 300px;
+    height: 300px;
+    border: 2px solid #6b5a33;
+    border-radius: 50%;
+  }
+  .ring2 {
+    position: absolute;
+    left: 143px;
+    top: 143px;
+    width: 180px;
+    height: 180px;
+    border: 1px solid #3a3020;
+    border-radius: 50%;
+  }
+  .num {
+    position: absolute;
+    left: 0;
+    top: 40px;
+    width: 466px;
+    font-size: 38px;
+    color: #ffd166;
+    text-align: center;
+  }
+  .hint {
+    position: absolute;
+    left: 0;
+    top: 382px;
+    width: 466px;
+    font-size: 16px;
+    color: #6f6250;
+    text-align: center;
+  }
+  .sprite {
+    position: absolute;
+    border-radius: 50%;
+  }
+</style>
+
+<script>
+  const CX = 233
+  const CY = 233
+  const PI2 = Math.PI * 2
+
+  export default {
+    data: {
+      num: '00',
+      sprites: []
+    },
+    angle: -Math.PI / 2,
+    timer: null,
+
+    onReady() {
+      this.timer = setInterval(() => this.draw(), 40)
+    },
+
+    onHide() {
+      if (this.timer) {
+        clearInterval(this.timer)
+        this.timer = null
+      }
+    },
+
+    onShow() {
+      if (!this.timer) {
+        this.timer = setInterval(() => this.draw(), 40)
+      }
+    },
+
+    onWheel(e) {
+      if (!e) return
+      let d = e.deltaY
+      if (!d) return
+      if (d > 1.5) d = 1.5
+      if (d < -1.5) d = -1.5
+      this.angle += d * 0.02
+      while (this.angle > Math.PI) this.angle -= PI2
+      while (this.angle < -Math.PI) this.angle += PI2
+      let v = Math.round(((this.angle + Math.PI / 2 + PI2) % PI2) / PI2 * 100) % 100
+      this.num = (v < 10 ? '0' + v : '' + v)
+    },
+
+    draw() {
+      const out = []
+      const add = (x, y, r, color) => {
+        out.push('left:' + Math.round(x - r) + 'px;top:' + Math.round(y - r) +
+          'px;width:' + Math.round(r * 2) + 'px;height:' + Math.round(r * 2) +
+          'px;background-color:' + color + ';')
+      }
+
+      // 24 个刻度
+      for (let i = 0; i < 24; i++) {
+        const a = i * PI2 / 24 - Math.PI / 2
+        const major = i % 6 === 0
+        const near = Math.abs(((a - this.angle + PI2) % PI2) - 0) < 0.13 ||
+                     Math.abs(((a - this.angle + PI2) % PI2) - PI2) < 0.13
+        const r = major ? 4.5 : 2.5
+        add(CX + Math.cos(a) * 150, CY + Math.sin(a) * 150, r,
+          (major || near) ? '#d4af5f' : '#4a3d22')
+      }
+
+      // 指针：一串圆点
+      const cos = Math.cos(this.angle)
+      const sin = Math.sin(this.angle)
+      for (let i = 0; i < 8; i++) {
+        const r = 42 + i * 14
+        const d = 3.4 - i * 0.2
+        add(CX + cos * r, CY + sin * r, d, i < 7 ? '#d4af5f' : '#ffe9b0')
+      }
+
+      // 中心轴
+      add(CX, CY, 24, '#120d07')
+      add(CX, CY, 15, '#1c1509')
+      add(CX, CY, 7, '#d4af5f')
+
+      this.sprites = out
+    }
+  }
+</script>
